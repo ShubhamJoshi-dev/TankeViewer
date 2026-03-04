@@ -1,4 +1,4 @@
-"""JSON viewer window with tree view."""
+
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class JsonViewer:
-    """Window that displays JSON in an organized tree view."""
+
 
     def __init__(self, config: AppConfig) -> None:
         self._config = config
@@ -25,7 +25,6 @@ class JsonViewer:
         self._build_ui()
 
     def _build_ui(self) -> None:
-        """Build toolbar and tree view."""
         main = ttk.Frame(self._root, padding=8)
         main.pack(fill=tk.BOTH, expand=True)
 
@@ -77,7 +76,7 @@ class JsonViewer:
         self._status.pack(pady=(8, 0), anchor=tk.W)
 
     def _configure_tags(self) -> None:
-        """Set colors for value types in the tree."""
+       
         if self._tree is None:
             return
         self._tree.tag_configure("object", foreground="#0550ae")
@@ -88,7 +87,7 @@ class JsonViewer:
         self._tree.tag_configure("null", foreground="#6e7681")
 
     def _on_open(self) -> None:
-        """Open file dialog and load JSON."""
+        
         path = filedialog.askopenfilename(
             title="Open JSON",
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
@@ -98,7 +97,7 @@ class JsonViewer:
         self._load_file(Path(path))
 
     def _load_file(self, path: Path) -> None:
-        """Load and display JSON from file."""
+       
         try:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
@@ -112,7 +111,7 @@ class JsonViewer:
             messagebox.showerror("Error", str(e))
 
     def _display(self, data: Any, root_label: str = "JSON") -> None:
-        """Clear tree and fill with JSON data."""
+ 
         if self._tree is None:
             return
         for item in self._tree.get_children():
@@ -130,7 +129,7 @@ class JsonViewer:
         key: str,
         value: Any,
     ) -> str:
-        """Insert a value into the tree; return the new item id."""
+       
         if self._tree is None:
             return ""
 
@@ -187,7 +186,7 @@ class JsonViewer:
         return item_id
 
     def _on_expand_all(self) -> None:
-        """Expand all tree nodes."""
+
         if self._tree is None:
             return
         def expand(item: str) -> None:
@@ -198,7 +197,7 @@ class JsonViewer:
             expand(item)
 
     def _on_collapse_all(self) -> None:
-        """Collapse all tree nodes."""
+      
         if self._tree is None:
             return
         def collapse(item: str) -> None:
@@ -209,5 +208,5 @@ class JsonViewer:
             collapse(item)
 
     def run(self) -> None:
-        """Start the main event loop."""
+   
         self._root.mainloop()

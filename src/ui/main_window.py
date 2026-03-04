@@ -1,4 +1,3 @@
-"""Main application window."""
 
 from __future__ import annotations
 
@@ -11,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class MainWindow:
-    """Main window of the desktop application."""
+ 
 
     def __init__(self, config: AppConfig) -> None:
         self._config = config
@@ -22,7 +21,7 @@ class MainWindow:
         self._build_ui()
 
     def _build_ui(self) -> None:
-        """Build the window content."""
+
         main = ttk.Frame(self._root, padding=16)
         main.pack(fill=tk.BOTH, expand=True)
 
@@ -44,7 +43,7 @@ class MainWindow:
         self._status.pack(pady=(16, 0))
 
     def _on_submit(self) -> None:
-        """Handle submit button click."""
+       
         value = self._entry.get().strip()
         if value:
             self._status.config(text=f"Submitted: {value}")
@@ -52,10 +51,10 @@ class MainWindow:
             self._status.config(text="Enter something first.")
 
     def _on_clear(self) -> None:
-        """Handle clear button click."""
+      
         self._entry.delete(0, tk.END)
         self._status.config(text="")
 
     def run(self) -> None:
-        """Start the main event loop."""
+      
         self._root.mainloop()

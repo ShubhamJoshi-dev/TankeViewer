@@ -1,10 +1,9 @@
-"""Application lifecycle and configuration."""
 
 from __future__ import annotations
 
 
 class AppConfig:
-    """Holds application configuration."""
+
 
     def __init__(
         self,
