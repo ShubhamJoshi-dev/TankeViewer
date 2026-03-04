@@ -1,5 +1,3 @@
-
-
 from __future__ import annotations
 
 import json
@@ -12,6 +10,27 @@ if TYPE_CHECKING:
     from src.core.app import AppConfig
 
 
+# Light theme so keys/values and type colors stay readable
+BG_WINDOW = "#f5f5f5"
+BG_TOOLBAR = "#e8e8e8"
+BG_TREE = "#ffffff"
+BG_HEADER = "#e0e0e0"
+BG_STATUS = "#eaeaea"
+FG_LABEL = "#333333"
+
+
+def _tree_font() -> tuple[str, int]:
+ 
+    try:
+        families = list(tk.font.families())
+        for name in ("SF Mono", "Menlo", "Consolas", "Monaco", "DejaVu Sans Mono"):
+            if name in families:
+                return (name, 12)
+    except Exception:
+        pass
+    return ("TkDefaultFont", 11)
+
+
 class JsonViewer:
 
 
@@ -20,47 +39,88 @@ class JsonViewer:
         self._root = tk.Tk()
         self._root.title(config.title)
         self._root.geometry(f"{config.width}x{config.height}")
-        self._root.minsize(400, 300)
+        self._root.minsize(500, 400)
+        self._root.configure(bg=BG_WINDOW)
         self._tree: ttk.Treeview | None = None
         self._build_ui()
 
     def _build_ui(self) -> None:
-        main = ttk.Frame(self._root, padding=8)
+       
+        main = tk.Frame(self._root, bg=BG_WINDOW, padx=12, pady=12)
         main.pack(fill=tk.BOTH, expand=True)
 
-        toolbar = ttk.Frame(main)
+        toolbar = tk.Frame(main, bg=BG_TOOLBAR, pady=10, padx=12)
         toolbar.pack(fill=tk.X, pady=(0, 8))
 
-        ttk.Button(toolbar, text="Open", command=self._on_open).pack(
-            side=tk.LEFT, padx=(0, 8)
+        btn_open = tk.Button(
+            toolbar,
+            text="Open",
+            command=self._on_open,
+            font=_tree_font(),
+            relief=tk.FLAT,
+            bg=BG_TOOLBAR,
+            fg=FG_LABEL,
+            activebackground=BG_TREE,
+            activeforeground=FG_LABEL,
+            cursor="hand2",
+            padx=14,
+            pady=6,
         )
-        ttk.Button(toolbar, text="Expand All", command=self._on_expand_all).pack(
-            side=tk.LEFT, padx=(0, 8)
+        btn_open.pack(side=tk.LEFT, padx=(0, 6))
+        btn_expand = tk.Button(
+            toolbar,
+            text="Expand All",
+            command=self._on_expand_all,
+            font=_tree_font(),
+            relief=tk.FLAT,
+            bg=BG_TOOLBAR,
+            fg=FG_LABEL,
+            activebackground=BG_TREE,
+            activeforeground=FG_LABEL,
+            cursor="hand2",
+            padx=14,
+            pady=6,
         )
-        ttk.Button(toolbar, text="Collapse All", command=self._on_collapse_all).pack(
-            side=tk.LEFT
+        btn_expand.pack(side=tk.LEFT, padx=(0, 6))
+        btn_collapse = tk.Button(
+            toolbar,
+            text="Collapse All",
+            command=self._on_collapse_all,
+            font=_tree_font(),
+            relief=tk.FLAT,
+            bg=BG_TOOLBAR,
+            fg=FG_LABEL,
+            activebackground=BG_TREE,
+            activeforeground=FG_LABEL,
+            cursor="hand2",
+            padx=14,
+            pady=6,
         )
+        btn_collapse.pack(side=tk.LEFT)
 
-        tree_frame = ttk.Frame(main)
+        tree_container = tk.Frame(main, bg=BG_WINDOW)
+        tree_container.pack(fill=tk.BOTH, expand=True)
+
+        tree_frame = tk.Frame(tree_container, bg=BG_TREE)
         tree_frame.pack(fill=tk.BOTH, expand=True)
 
-        scroll_y = ttk.Scrollbar(tree_frame)
-        scroll_x = ttk.Scrollbar(tree_frame, orient=tk.HORIZONTAL)
+        scroll_y = tk.Scrollbar(tree_frame, bg=BG_TREE)
+        scroll_x = tk.Scrollbar(tree_frame, orient=tk.HORIZONTAL, bg=BG_TREE)
 
         self._tree = ttk.Treeview(
             tree_frame,
             columns=("value",),
             show="tree headings",
-            height=20,
+            height=22,
             yscrollcommand=scroll_y.set,
             xscrollcommand=scroll_x.set,
             selectmode="browse",
         )
         self._tree.heading("#0", text="Key")
         self._tree.heading("value", text="Value")
-        self._tree.column("#0", minwidth=200, width=280)
-        self._tree.column("value", minwidth=150, width=200)
-
+        self._tree.column("#0", minwidth=260, width=320)
+        self._tree.column("value", minwidth=200, width=320)
+        self._configure_style()
         self._configure_tags()
 
         scroll_y.config(command=self._tree.yview)
@@ -72,22 +132,55 @@ class JsonViewer:
         tree_frame.rowconfigure(0, weight=1)
         tree_frame.columnconfigure(0, weight=1)
 
-        self._status = ttk.Label(main, text="Open a JSON file to start.")
-        self._status.pack(pady=(8, 0), anchor=tk.W)
+        status_frame = tk.Frame(main, bg=BG_STATUS, pady=8, padx=12)
+        status_frame.pack(fill=tk.X, pady=(8, 0))
+        self._status = tk.Label(
+            status_frame,
+            text="Open a JSON file to start.",
+            font=_tree_font(),
+            bg=BG_STATUS,
+            fg="#666666",
+            anchor=tk.W,
+        )
+        self._status.pack(fill=tk.X)
+
+    def _configure_style(self) -> None:
+      
+        style = ttk.Style()
+        style.configure(
+            "Json.Treeview",
+            background=BG_TREE,
+            foreground=FG_LABEL,
+            fieldbackground=BG_TREE,
+            rowheight=24,
+            font=_tree_font(),
+        )
+        style.configure(
+            "Json.Treeview.Heading",
+            background=BG_HEADER,
+            foreground=FG_LABEL,
+            font=_tree_font(),
+        )
+        style.map(
+            "Json.Treeview",
+            background=[("selected", "#2563eb")],
+            foreground=[("selected", "#ffffff")],
+        )
+        self._tree.configure(style="Json.Treeview")
 
     def _configure_tags(self) -> None:
-       
+      
         if self._tree is None:
             return
-        self._tree.tag_configure("object", foreground="#0550ae")
-        self._tree.tag_configure("array", foreground="#0e6f42")
-        self._tree.tag_configure("string", foreground="#0a3069")
-        self._tree.tag_configure("number", foreground="#953800")
-        self._tree.tag_configure("boolean", foreground="#6e40c9")
-        self._tree.tag_configure("null", foreground="#6e7681")
+        self._tree.tag_configure("object", foreground="#1d4ed8")
+        self._tree.tag_configure("array", foreground="#15803d")
+        self._tree.tag_configure("string", foreground="#1f2937")
+        self._tree.tag_configure("number", foreground="#c2410c")
+        self._tree.tag_configure("boolean", foreground="#7c3aed")
+        self._tree.tag_configure("null", foreground="#6b7280")
 
     def _on_open(self) -> None:
-        
+
         path = filedialog.askopenfilename(
             title="Open JSON",
             filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
@@ -97,7 +190,7 @@ class JsonViewer:
         self._load_file(Path(path))
 
     def _load_file(self, path: Path) -> None:
-       
+
         try:
             with open(path, encoding="utf-8") as f:
                 data = json.load(f)
@@ -111,7 +204,7 @@ class JsonViewer:
             messagebox.showerror("Error", str(e))
 
     def _display(self, data: Any, root_label: str = "JSON") -> None:
- 
+       
         if self._tree is None:
             return
         for item in self._tree.get_children():
@@ -186,7 +279,7 @@ class JsonViewer:
         return item_id
 
     def _on_expand_all(self) -> None:
-
+       
         if self._tree is None:
             return
         def expand(item: str) -> None:
@@ -197,7 +290,7 @@ class JsonViewer:
             expand(item)
 
     def _on_collapse_all(self) -> None:
-      
+  
         if self._tree is None:
             return
         def collapse(item: str) -> None:
@@ -208,5 +301,5 @@ class JsonViewer:
             collapse(item)
 
     def run(self) -> None:
-   
+       
         self._root.mainloop()
