@@ -1,0 +1,9 @@
+{
+  "name": "Test",
+  "count": 42,
+  "active": true,
+  "items": ["a", "b", "c"],
+  "nested": {
+    "key": "value"
+  }
+}

@@ -1,0 +1,2 @@
+# Python Desktop App - dependencies
+# Tkinter is in the standard library; list any extras here if needed later.
